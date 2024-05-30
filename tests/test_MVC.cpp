@@ -4,7 +4,6 @@
 #include <doctest.h>
 #include "Core.hpp"
 #include "ControllerInterface.hpp"
-#define NUM_VALUE 21
 
 
 class FirstView {
@@ -20,7 +19,7 @@ class FirstModel {
     public:
         FirstModel() {};
         ~FirstModel() {};
-        int num = NUM_VALUE;
+        int num = 21;
 };
 
 class FirstController : public ControllerInterface {
