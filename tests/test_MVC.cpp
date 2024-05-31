@@ -1,6 +1,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <iostream>
 #include <string>
+#include <typeinfo>
 #include <doctest.h>
 #include "Core.hpp"
 #include "ControllerInterface.hpp"
@@ -70,6 +71,7 @@ class SecondController : public ControllerInterface {
 
 TEST_CASE("Working Core and Controller classes") {
     Core core(new FirstController);
+    REQUIRE(typeid(*core.currentController) == typeid(FirstController));
 
     SUBCASE("Running the current controller") {
         core.currentController->run();
@@ -77,6 +79,14 @@ TEST_CASE("Working Core and Controller classes") {
 
     SUBCASE("Switching the current controller") {
         core.switchController(new SecondController);
+        REQUIRE(typeid(*core.currentController) == typeid(SecondController));
         core.currentController->run();
+    }
+
+    SUBCASE("Accessing derived-exlusive members with dynamic cast") {
+        FirstController* currentController = (
+            dynamic_cast<FirstController*>(core.currentController)
+        );
+        CHECK(currentController->model.num == 21);
     }
 }
