@@ -4,7 +4,7 @@
 #include <flecs.h>
 
 
-TEST_CASE("Working flecs library") {
+TEST_CASE("Working flecs framework") {
     SUBCASE("Creating world") {
         flecs::world world;
     }
@@ -60,5 +60,23 @@ TEST_CASE("Working flecs library") {
         CHECK(pos.x == x);
         CHECK(pos.y == y);
         jeefDing.destruct();
+    }
+
+    SUBCASE("Simple each filter") {
+        flecs::world world;
+
+        typedef int Health;
+
+        const int jarDlingHealth = 5;
+        auto jarDling = world.entity("Jar Dling").set<Health>(jarDlingHealth);
+        const int jebDarlsHealth = 3;
+        auto jebDarls = world.entity("Jeb Darls").set<Health>(jebDarlsHealth);
+
+        world.each([](Health& health) {
+            health -= 1;
+        });
+
+        CHECK(*jarDling.get<Health>() == jarDlingHealth - 1);
+        CHECK(*jebDarls.get<Health>() == jebDarlsHealth - 1);
     }
 }
