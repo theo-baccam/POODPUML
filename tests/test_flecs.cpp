@@ -62,6 +62,29 @@ TEST_CASE("Working flecs framework") {
         jeefDing.destruct();
     }
 
+    SUBCASE("Tag management") {
+        // Tags are components with no data
+
+        flecs::world world;
+
+        // Struct Tag is fixed at compile time
+        struct StructTag {};
+        typedef struct StructTag StructTag;
+
+        auto johnDoe = world.entity().add<StructTag>();
+        CHECK(johnDoe.has<StructTag>() == true);
+        johnDoe.remove<StructTag>();
+        CHECK(johnDoe.has<StructTag>() == false);
+
+        // Entity Tag can be created dynamically at runtime
+        auto EntityTag = world.entity();
+
+        auto janeDoe = world.entity().add(EntityTag);
+        CHECK(janeDoe.has(EntityTag) == true);
+        janeDoe.remove(EntityTag);
+        CHECK(janeDoe.has(EntityTag) == false);
+    }
+
     SUBCASE("Simple each filter") {
         flecs::world world;
 
