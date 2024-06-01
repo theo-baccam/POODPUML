@@ -163,31 +163,37 @@ TEST_CASE("Working flecs framework") {
 
         flecs::world world;
 
-        auto janeDoe = world.entity();
-        auto johnDoe = world.entity();
-        REQUIRE(janeDoe.is_alive() == true);
-        REQUIRE(johnDoe.is_alive() == true);
 
         const double janeDoeHealth = 5.32;
-        janeDoe.set<Health>({janeDoeHealth});
+        const int janeDoeSpeed = 2;
+
+        auto janeDoe = world.entity()
+            .set<Health>({janeDoeHealth})
+            .set<Speed>({janeDoeSpeed});
+        REQUIRE(janeDoe.is_alive() == true);
+
         REQUIRE(janeDoe.has<Health>() == true);
         REQUIRE(janeDoe.get<Health>()->value == janeDoeHealth);
 
-        const double johnDoeHealth = 3.76;
-        johnDoe.set<Health>({johnDoeHealth});
-        REQUIRE(johnDoe.has<Health>() == true);
-        REQUIRE(johnDoe.get<Health>()->value == johnDoeHealth);
-
-        const int janeDoeSpeed = 2;
-        janeDoe.set<Speed>({janeDoeSpeed});
         REQUIRE(janeDoe.has<Speed>() == true);
         REQUIRE(janeDoe.get<Speed>()->value == janeDoeSpeed);
 
+
+        const double johnDoeHealth = 3.76;
         const int johnDoeSpeed = 5;
-        johnDoe.set<Speed>({johnDoeSpeed});
+
+        auto johnDoe = world.entity()
+            .set<Health>({johnDoeHealth})
+            .set<Speed>({johnDoeSpeed});
+        REQUIRE(johnDoe.is_alive() == true);
+
+        REQUIRE(johnDoe.has<Health>() == true);
+        REQUIRE(johnDoe.get<Health>()->value == johnDoeHealth);
+
         REQUIRE(johnDoe.has<Speed>() == true);
         REQUIRE(johnDoe.get<Speed>()->value == johnDoeSpeed);
 
+        // An each function iterates over each existing entity
         world.each([](Health& health, Speed& speed) {
             health.value -= 1;
             speed.value += 1; 
