@@ -41,7 +41,7 @@ TEST_CASE("Working flecs framework") {
 
         flecs::world world;
 
-        auto johnDoe = world.entity();
+        flecs::entity johnDoe = world.entity();
         CHECK(johnDoe.is_alive() == true);
         johnDoe.destruct();
         CHECK(johnDoe.is_alive() == false);
@@ -53,14 +53,14 @@ TEST_CASE("Working flecs framework") {
         flecs::world world;
 
         const char *name = "Jane Doe";
-        auto janeDoe = world.entity(name);
+        flecs::entity janeDoe = world.entity(name);
         REQUIRE(janeDoe.is_alive() == true);
         CHECK(janeDoe.name() == name);
 
-        auto correctNameLookUp = world.lookup(name);
+        flecs::entity correctNameLookUp = world.lookup(name);
         CHECK(janeDoe == correctNameLookUp);
 
-        auto wrongNameLookUp = world.lookup("John Doe");
+        flecs::entity wrongNameLookUp = world.lookup("John Doe");
         CHECK(janeDoe != wrongNameLookUp);
 
         janeDoe.destruct();
@@ -71,7 +71,7 @@ TEST_CASE("Working flecs framework") {
 
         flecs::world world;
 
-        auto johnDoe = world.entity();
+        flecs::entity johnDoe = world.entity();
         REQUIRE(johnDoe.is_alive() == true);
 
         // You can `add` a component to an entity without giving a value
@@ -102,15 +102,15 @@ TEST_CASE("Working flecs framework") {
         flecs::world world;
 
         // Struct Tag is fixed at compile time
-        auto johnDoe = world.entity().add<StructTag>();
+        flecs::entity johnDoe = world.entity().add<StructTag>();
         CHECK(johnDoe.has<StructTag>() == true);
         johnDoe.remove<StructTag>();
         CHECK(johnDoe.has<StructTag>() == false);
 
         // Entity Tag can be created dynamically at runtime
-        auto EntityTag = world.entity();
+        flecs::entity EntityTag = world.entity();
 
-        auto janeDoe = world.entity().add(EntityTag);
+        flecs::entity janeDoe = world.entity().add(EntityTag);
         CHECK(janeDoe.has(EntityTag) == true);
         janeDoe.remove(EntityTag);
         CHECK(janeDoe.has(EntityTag) == false);
@@ -125,8 +125,8 @@ TEST_CASE("Working flecs framework") {
 
         flecs::world world;
 
-        auto antHill = world.entity();
-        auto ant = world.entity();
+        flecs::entity antHill = world.entity();
+        flecs::entity ant = world.entity();
         REQUIRE(antHill.is_alive() == true);
         REQUIRE(ant.is_alive() == true);
 
@@ -146,7 +146,7 @@ TEST_CASE("Working flecs framework") {
         flecs::world world;
 
         // Useful way of creating an entity and adding IDs
-        auto character = world.entity()
+        flecs::entity character = world.entity()
             .set<Health>({14.5})
             .set<Position>({32.85, 12.94});
         REQUIRE(character.is_alive() == true);
@@ -167,7 +167,7 @@ TEST_CASE("Working flecs framework") {
         const double janeDoeHealth = 5.32;
         const int janeDoeSpeed = 2;
 
-        auto janeDoe = world.entity()
+        flecs::entity janeDoe = world.entity()
             .set<Health>({janeDoeHealth})
             .set<Speed>({janeDoeSpeed});
         REQUIRE(janeDoe.is_alive() == true);
@@ -182,7 +182,7 @@ TEST_CASE("Working flecs framework") {
         const double johnDoeHealth = 3.76;
         const int johnDoeSpeed = 5;
 
-        auto johnDoe = world.entity()
+        flecs::entity johnDoe = world.entity()
             .set<Health>({johnDoeHealth})
             .set<Speed>({johnDoeSpeed});
         REQUIRE(johnDoe.is_alive() == true);
