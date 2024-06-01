@@ -21,6 +21,9 @@ typedef struct {} Contains;
 // Used in: 6
 typedef struct {} ComesFrom;
 
+// Used in: 8
+typedef struct {int value;} Speed;
+
 
 
 TEST_CASE("Working flecs framework") {
@@ -160,10 +163,10 @@ TEST_CASE("Working flecs framework") {
 
         flecs::world world;
 
-        typedef struct {int value;} Speed;
-
         auto janeDoe = world.entity();
         auto johnDoe = world.entity();
+        REQUIRE(janeDoe.is_alive() == true);
+        REQUIRE(johnDoe.is_alive() == true);
 
         const double janeDoeHealth = 5.32;
         janeDoe.set<Health>({janeDoeHealth});
