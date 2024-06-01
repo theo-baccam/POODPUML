@@ -3,10 +3,10 @@
 #include <flecs.h>
 
 
-// Used in: 4, 7
+// Used in: 4, 7, 8
 typedef struct {double value;} Health;
 
-// Used in: 4
+// Used in: 4, 7
 typedef struct{
     double x;
     double y;
@@ -137,7 +137,23 @@ TEST_CASE("Working flecs framework") {
         ant.destruct();
     }
 
-    SUBCASE("7. Simple each filter") {
+    SUBCASE("7. Type management") {
+        // A type, a.k.a. archetype, is an list of IDs possessed by an entity
+
+        flecs::world world;
+
+        // Useful way of creating an entity and adding IDs
+        auto character = world.entity()
+            .set<Health>({14.5})
+            .set<Position>({32.85, 12.94});
+        REQUIRE(character.is_alive() == true);
+
+        CHECK(character.type().str() == "Health, Position");
+
+        character.destruct();
+    }
+
+    SUBCASE("8. Simple each filter") {
         // A filter is a query whose results are not cached, making it cheap
         // to create.
         // Useful when querying for something not known in advance
