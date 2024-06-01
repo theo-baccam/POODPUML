@@ -3,7 +3,7 @@
 #include <flecs.h>
 
 
-// Used in: 4, 7, 8
+// Used in: 4, 7, 8, 9
 typedef struct {double value;} Health;
 
 // Used in: 4, 7
@@ -21,7 +21,7 @@ typedef struct {} Contains;
 // Used in: 6
 typedef struct {} ComesFrom;
 
-// Used in: 8
+// Used in: 8, 9
 typedef struct {int value;} Speed;
 
 
@@ -206,5 +206,75 @@ TEST_CASE("Working flecs framework") {
 
         janeDoe.destruct();
         johnDoe.destruct();
+    }
+
+    SUBCASE("9. Filter builder and iter") {
+        // You can create more complex filters as well
+
+        flecs::world world;
+
+
+        const double janeDoeHealth = 5.32;
+        const int janeDoeSpeed = 2;
+
+        flecs::entity janeDoe = world.entity()
+            .set<Health>({janeDoeHealth})
+            .set<Speed>({janeDoeSpeed});
+        REQUIRE(janeDoe.is_alive() == true);
+
+        REQUIRE(janeDoe.has<Health>() == true);
+        REQUIRE(janeDoe.get<Health>()->value == janeDoeHealth);
+
+        REQUIRE(janeDoe.has<Speed>() == true);
+        REQUIRE(janeDoe.get<Speed>()->value == janeDoeSpeed);
+
+
+        const double johnDoeHealth = 3.76;
+        const int johnDoeSpeed = 5;
+
+        flecs::entity johnDoe = world.entity()
+            .set<Health>({johnDoeHealth})
+            .set<Speed>({johnDoeSpeed});
+        REQUIRE(johnDoe.is_alive() == true);
+
+        REQUIRE(johnDoe.has<Health>() == true);
+        REQUIRE(johnDoe.get<Health>()->value == johnDoeHealth);
+
+        REQUIRE(johnDoe.has<Speed>() == true);
+        REQUIRE(johnDoe.get<Speed>()->value == johnDoeSpeed);
+
+
+        const double jayDoeHealth = 9.32;
+
+        flecs::entity jayDoe = world.entity()
+            .set<Health>({jayDoeHealth});
+        REQUIRE(jayDoe.is_alive() == true);
+
+        REQUIRE(jayDoe.has<Health>() == true);
+        REQUIRE(jayDoe.get<Health>()->value == jayDoeHealth);
+
+        REQUIRE(jayDoe.has<Speed>() == false);
+
+       // Here is a filter for entities that have Health and Speed components
+       // There are more complex operators, for example wildcards, exlusions... 
+        flecs::filter<Health, Speed> healthSpeedFilter =
+            world.filter<Health, Speed>();
+
+        // You use iter in order to iterate through each entity which
+        // matches an archetype
+        healthSpeedFilter.iter([&](flecs::iter& it, Health *h, Speed *s) {
+            for (auto i : it) {
+                h[i].value += 1;
+            };
+        });
+
+        // Since Jay Doe doesn't have Speed, his health isn't affected
+        CHECK(janeDoe.get<Health>()->value == janeDoeHealth + 1);
+        CHECK(johnDoe.get<Health>()->value == johnDoeHealth + 1);
+        CHECK(jayDoe.get<Health>()->value == jayDoeHealth);
+
+        janeDoe.destruct();
+        johnDoe.destruct();
+        jayDoe.destruct();
     }
 }
