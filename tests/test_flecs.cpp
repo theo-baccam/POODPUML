@@ -3,7 +3,7 @@
 #include <flecs.h>
 
 
-// Used in: 4, 6
+// Used in: 4, 7
 typedef struct {double value;} Health;
 
 // Used in: 4
@@ -14,6 +14,13 @@ typedef struct{
 
 // Used in: 5
 typedef struct {} StructTag;
+
+// Used in: 6
+typedef struct {} Contains;
+
+// Used in: 6
+typedef struct {} ComesFrom;
+
 
 
 TEST_CASE("Working flecs framework") {
@@ -109,7 +116,28 @@ TEST_CASE("Working flecs framework") {
         janeDoe.destruct();
     }
 
-    SUBCASE("6. Simple each filter") {
+    SUBCASE("6. Pair management") {
+        // A pair is an id with two entities, can be used to indicate
+        // relationships between entities
+
+        flecs::world world;
+
+        auto antHill = world.entity();
+        auto ant = world.entity();
+        REQUIRE(antHill.is_alive() == true);
+        REQUIRE(ant.is_alive() == true);
+
+        antHill.add<Contains>(ant);
+        ant.add<ComesFrom>(antHill);
+
+        CHECK(antHill.has<Contains>(ant) == true);
+        CHECK(ant.has<ComesFrom>(antHill) == true);
+
+        antHill.destruct();
+        ant.destruct();
+    }
+
+    SUBCASE("7. Simple each filter") {
         // A filter is a query whose results are not cached, making it cheap
         // to create.
         // Useful when querying for something not known in advance
