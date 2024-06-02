@@ -25,7 +25,6 @@ typedef struct {} ComesFrom;
 typedef struct {int value;} Speed;
 
 
-
 TEST_CASE("Working flecs framework") {
 
     SUBCASE("1. Creating world") {
@@ -208,8 +207,8 @@ TEST_CASE("Working flecs framework") {
         johnDoe.destruct();
     }
 
-    SUBCASE("9. Filter builder and iter") {
-        // You can create more complex filters as well
+    SUBCASE("9. Creating queries, and iter") {
+        // You can create more complex filters/queries as well
 
         flecs::world world;
 
@@ -255,14 +254,18 @@ TEST_CASE("Working flecs framework") {
 
         REQUIRE(jayDoe.has<Speed>() == false);
 
-       // Here is a filter for entities that have Health and Speed components
-       // There are more complex operators, for example wildcards, exlusions... 
-        flecs::filter<Health, Speed> healthSpeedFilter =
-            world.filter<Health, Speed>();
+        // A query is a cached filter, it is slower to create but faster to
+        // iterate through, they are meant to be reused and not to be
+        // created in a loop.
+
+        // Here is a query for entities that have Health and Speed components
+        // There are more complex operators, for example wildcards, exlusions... 
+        flecs::query<Health, Speed> healthSpeedQuery =
+            world.query<Health, Speed>();
 
         // You use iter in order to iterate through each entity which
         // matches an archetype
-        healthSpeedFilter.iter([&](flecs::iter& it, Health *h, Speed *s) {
+        healthSpeedQuery.iter([&](flecs::iter& it, Health *h, Speed *s) {
             for (auto i : it) {
                 h[i].value += 1;
             };
