@@ -1,10 +1,12 @@
 #include <flecs.h>
 #include "GameModel.hpp"
+#include "LevelBuilder.hpp"
 
 
 GameModel::GameModel(int difficulty) {
+    LevelBuilder levelBuilder;
     switch (difficulty) {
-        case 0: break;
+        case 0: levelBuilder.buildEasyLevel(this->world); break;
         case 1: break;
         case 2: break;
     }

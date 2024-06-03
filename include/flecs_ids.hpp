@@ -1,2 +1,2 @@
-struct Position {double x, double y};
-struct FloorTag {};
+struct {} typedef FloorTag;
+struct {double x; double y;} typedef Position;
