@@ -2,7 +2,7 @@ ESSENTIAL_FLAGS = -I include/ -L lib/
 RAYLIB_FLAGS = -lraylib -lopengl32 -lgdi32 -lwinmm
 
 all: $(wildcard src/*.cpp)
-	g++ $^ $(ESSENTIAL_FLAGS) $(RAYLIB_FLAGS) -o tower-defense
+	g++ $^ obj/flecs.o $(ESSENTIAL_FLAGS) $(RAYLIB_FLAGS) -std=c++0x -o tower-defense -lWs2_32
 
 flecs: $(obj/flecs.c)
 	g++ $^ -I include -std=gnu99 -c -o obj/flecs.o -lWs2_32
