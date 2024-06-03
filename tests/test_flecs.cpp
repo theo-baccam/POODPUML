@@ -1,6 +1,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest.h>
 #include <flecs.h>
+#define BOB_NAME "Bob"
 
 
 // Used in: 4, 7, 8, 9
@@ -23,6 +24,11 @@ typedef struct {} ComesFrom;
 
 // Used in: 8, 9
 typedef struct {int value;} Speed;
+
+// Used in 10;
+void addEntity(flecs::world &world) {
+    flecs::entity bob = world.entity(BOB_NAME);
+}
 
 
 TEST_CASE("Working flecs framework") {
@@ -279,5 +285,19 @@ TEST_CASE("Working flecs framework") {
         janeDoe.destruct();
         johnDoe.destruct();
         jayDoe.destruct();
+    }
+
+    SUBCASE("10. Adding entites to a world through function") {
+        // Test to see if one can add entities via a function.
+        // To be used for Builders
+
+        flecs::world world;
+
+        // If no entity, world.lookup() returns a 0 instead of an entity
+        REQUIRE(world.lookup(BOB_NAME) == 0);
+
+        // Add entity through function and check if alive
+        addEntity(world);
+        CHECK(world.lookup(BOB_NAME).is_alive() == true);
     }
 }
