@@ -1,3 +1,4 @@
+#include <raylib.h>
 #include "Core.hpp"
 #include "ControllerInterface.hpp"
 
