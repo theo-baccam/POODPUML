@@ -3,6 +3,7 @@
 #include "flecs_ids.hpp"
 #include "ControllerInterface.hpp"
 #include "GameModel.hpp"
+#include "GameView.hpp"
 
 
 class GameController : public ControllerInterface {
@@ -11,8 +12,9 @@ class GameController : public ControllerInterface {
         ~GameController();
 
         GameModel model;
+        GameView view;
 
-        flecs::query<FloorTag> floorQuery;
+        flecs::query<FloorTag, Position> floorQuery;
 
         void run() override;
 };

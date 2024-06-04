@@ -12,8 +12,9 @@ void LevelBuilder::buildEasyLevel(flecs::world &world) {
 
     for (int y = 0; y < mapDimensions; y++) {
         for (int x = 0; x < mapDimensions; x++) {
-            world.entity().
-                set<Position>({(double) x, (double) y});
+            world.entity()
+                .add<FloorTag>()
+                .set<Position>({(double) x, (double) y});
         };
     };
 }
