@@ -14,6 +14,8 @@ GameController::~GameController() {}
 void GameController::run() {
     BeginDrawing();
     ClearBackground(COLOR0);
-    this->view.drawFloor(this->floorQuery);
+    BeginMode2D(this->view.camera);
+        this->view.drawFloor(this->floorQuery);
+    EndMode2D();
     EndDrawing();
 }
