@@ -7,7 +7,7 @@
 #include "colors.hpp"
 
 
-GameController::GameController() : model(0) {
+GameController::GameController() : model(2) {
     this->floorQuery = this->model.world.query<FloorTag, Position>();
 }
 GameController::~GameController() {}
