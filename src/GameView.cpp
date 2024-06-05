@@ -7,8 +7,8 @@
 #define SPRITE_DIMENSIONS 32
 
 
-GameView::GameView() {
-    this->camera.target = (Vector2) {0, 0};
+GameView::GameView(int x, int y) {
+    this->camera.target = transformGridOblique(double (x), double(y));
     this->camera.offset = (Vector2) {
         (float) GetScreenWidth() / 2,
         (float) GetScreenHeight() / 2

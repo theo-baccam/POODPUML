@@ -9,13 +9,12 @@ class GameView {
     private:
         AssetsLoader assetsLoader;
 
-        Vector2 transformGridOblique(double x, double y);
-
     public:
-        GameView();
+        GameView(int x, int y);
         ~GameView();
 
         Camera2D camera;
 
+        Vector2 transformGridOblique(double x, double y);
         void drawFloor(flecs::query<FloorTag, Position> &floorQuery);
 };
