@@ -7,7 +7,7 @@
 #include "colors.hpp"
 
 GameController::GameController():
-    model(2),
+    model(1),
     view(
         this->model.world.lookup("Cursor").get<Position>()->x,
         this->model.world.lookup("Cursor").get<Position>()->y
@@ -53,6 +53,7 @@ void GameController::run() {
     ClearBackground(COLOR0);
     BeginMode2D(this->view.camera);
         this->view.drawFloor(this->floorQuery);
+        this->view.drawStartEnd(this->model.world);
     EndMode2D();
     EndDrawing();
 }

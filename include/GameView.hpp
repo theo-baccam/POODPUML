@@ -17,4 +17,5 @@ class GameView {
 
         Vector2 transformGridOblique(double x, double y);
         void drawFloor(flecs::query<FloorTag, Position> &floorQuery);
+        void drawStartEnd(flecs::world &world);
 };

@@ -12,16 +12,22 @@ void LevelBuilder::buildEasyLevel(flecs::world &world) {
 
     for (int y = 0; y < mapDimensions; y++) {
         for (int x = 0; x < mapDimensions; x++) {
+            if ((x == 0 && y == 0) || (x == 15 && y == 15)) continue;
             world.entity()
                 .add<FloorTag>()
                 .set<Position>({(double) x, (double) y});
         };
     };
+
+    world.entity("Start")
+        .set<Position>({0, 0});
+    world.entity("End")
+        .set<Position>({15, 15});
 }
 
 void LevelBuilder::buildMediumLevel(flecs::world &world) {
     const char map[] =
-        ".........#######........\n"
+        ".........##S####........\n"
         ".......###########......\n"
         "...################.....\n"
         "..##################....\n"
@@ -44,11 +50,31 @@ void LevelBuilder::buildMediumLevel(flecs::world &world) {
         "..################......\n"
         "..##################....\n"
         "...#################....\n"
-        "....####....######......";
+        "....#E##....######......";
 
     int x = 0;
     int y = 0;
     for (char c : map) {
+        switch (c) {
+            case '#':
+                world.entity()
+                    .add<FloorTag>()
+                    .set<Position>({(double) x, (double) y});
+                break;
+            case 'S':
+                world.entity("Start")
+                    .set<Position>({(double) x, (double) y});
+                break;
+            case 'E':
+                world.entity("End")
+                    .set<Position>({(double) x, (double) y});
+                break;
+            case '\n':
+                x = 0;
+                y++;
+                break;
+        };
+        /*
         if (c == '#') {
             world.entity()
                 .add<FloorTag>()
@@ -57,6 +83,7 @@ void LevelBuilder::buildMediumLevel(flecs::world &world) {
             x = 0;
             y++;
         }
+        */
         x++;
     };
 }
@@ -69,7 +96,7 @@ void LevelBuilder::buildHardLevel(flecs::world &world) {
         "..................#################.##############..............\n"
         "...........################.........########....................\n"
         "####################................##..........................\n"
-        "###################................###..........................\n"
+        "S##################................###..........................\n"
         "####################...............###..........................\n"
         ".............############....###########........#####...........\n"
         ".................##########################...########..........\n"
@@ -93,12 +120,32 @@ void LevelBuilder::buildHardLevel(flecs::world &world) {
         "....#########............###################..........###.......\n"
         "....########..............#####################....########.....\n"
         "....########................##############.################.....\n"
-        ".....###.......................##########......####...#####.....\n"
+        ".....###.......................##########......####...###E#.....\n"
         "................................................................";
 
     int x = 0;
     int y = 0;
     for (char c : map) {
+        switch (c) {
+            case '#':
+                world.entity()
+                    .add<FloorTag>()
+                    .set<Position>({(double) x, (double) y});
+                break;
+            case 'S':
+                world.entity("Start")
+                    .set<Position>({(double) x, (double) y});
+                break;
+            case 'E':
+                world.entity("End")
+                    .set<Position>({(double) x, (double) y});
+                break;
+            case '\n':
+                x = 0;
+                y++;
+                break;
+        };
+        /*
         if (c == '#') {
             world.entity()
                 .add<FloorTag>()
@@ -107,6 +154,7 @@ void LevelBuilder::buildHardLevel(flecs::world &world) {
             x = 0;
             y++;
         }
+        */
         x++;
     };
 }

@@ -37,3 +37,22 @@ void GameView::drawFloor(flecs::query<FloorTag, Position> &floorQuery) {
         );
     });
 };
+
+void GameView::drawStartEnd(flecs::world &world) {
+    flecs::entity start = world.lookup("Start");
+    const Position* startPosition = start.get<Position>();
+
+    flecs::entity end = world.lookup("End");
+    const Position* endPosition = end.get<Position>();
+
+    DrawTextureV(
+        this->assetsLoader.startTexture,
+        this->transformGridOblique(startPosition->x, startPosition->y),
+        WHITE
+    );
+    DrawTextureV(
+        this->assetsLoader.endTexture,
+        this->transformGridOblique(endPosition->x, endPosition->y),
+        WHITE
+    );
+}
