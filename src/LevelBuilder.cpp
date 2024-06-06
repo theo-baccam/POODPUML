@@ -74,16 +74,6 @@ void LevelBuilder::buildMediumLevel(flecs::world &world) {
                 y++;
                 break;
         };
-        /*
-        if (c == '#') {
-            world.entity()
-                .add<FloorTag>()
-                .set<Position>({(double) x, (double) y});
-        } else if (c == '\n') {
-            x = 0;
-            y++;
-        }
-        */
         x++;
     };
 }
@@ -145,16 +135,6 @@ void LevelBuilder::buildHardLevel(flecs::world &world) {
                 y++;
                 break;
         };
-        /*
-        if (c == '#') {
-            world.entity()
-                .add<FloorTag>()
-                .set<Position>({(double) x, (double) y});
-        } else if (c == '\n') {
-            x = 0;
-            y++;
-        }
-        */
         x++;
     };
 }

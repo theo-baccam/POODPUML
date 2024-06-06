@@ -12,12 +12,12 @@ GameModel::GameModel(int difficulty) {
         case 2: levelBuilder.buildHardLevel(this->world); break;
     }
 
-    const Position* startPosition = this->world.lookup("Start").get<Position>();
+    flecs::entity start = this->world.lookup("Start");
+    const Position* startPosition = start.get<Position>();
 
     this->world.entity("Cursor")
-        .set<Position>(*startPosition)
+        .set<Position>({startPosition->x, startPosition->y})
         .set<Tick>({0, 6});
-    
 }
 GameModel::~GameModel() {
     this->world.each([](flecs::entity entity) {

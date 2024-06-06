@@ -56,3 +56,12 @@ void GameView::drawStartEnd(flecs::world &world) {
         WHITE
     );
 }
+
+void GameView::drawCursor(flecs::entity cursor) {
+    const Position* cursorPosition = cursor.get<Position>();
+    DrawTextureV(
+        this->assetsLoader.cursorTexture,
+        this->transformGridOblique(cursorPosition->x, cursorPosition->y),
+        WHITE
+    );
+}
