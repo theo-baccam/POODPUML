@@ -20,8 +20,10 @@ void LevelBuilder::buildEasyLevel(flecs::world &world) {
     };
 
     world.entity("Start")
+        .add<FloorTag>()
         .set<Position>({0, 0});
     world.entity("End")
+        .add<FloorTag>()
         .set<Position>({15, 15});
 }
 
@@ -63,10 +65,12 @@ void LevelBuilder::buildMediumLevel(flecs::world &world) {
                 break;
             case 'S':
                 world.entity("Start")
+                    .add<FloorTag>()
                     .set<Position>({(double) x, (double) y});
                 break;
             case 'E':
                 world.entity("End")
+                    .add<FloorTag>()
                     .set<Position>({(double) x, (double) y});
                 break;
             case '\n':
@@ -124,10 +128,12 @@ void LevelBuilder::buildHardLevel(flecs::world &world) {
                 break;
             case 'S':
                 world.entity("Start")
+                    .add<FloorTag>()
                     .set<Position>({(double) x, (double) y});
                 break;
             case 'E':
                 world.entity("End")
+                    .add<FloorTag>()
                     .set<Position>({(double) x, (double) y});
                 break;
             case '\n':

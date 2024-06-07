@@ -6,6 +6,9 @@
 #include "GameView.hpp"
 #include "colors.hpp"
 
+
+#include <iostream>
+
 GameController::GameController():
     model(2),
     view(
@@ -30,13 +33,33 @@ void GameController::run() {
         IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_RIGHT)
     ) {
         if (IsKeyDown(KEY_UP)) {
-            if (cursorTick == 0) cursorY -= 1;
+            flecs::entity northNeighbor = this->floorQuery.find([&](
+                FloorTag floorTag, Position position
+            ) {
+                return position.x == cursorX && position.y == cursorY - 1;
+            });
+            if (cursorTick == 0 && northNeighbor) cursorY -= 1;
         } else if (IsKeyDown(KEY_DOWN)) {
-            if (cursorTick == 0) cursorY += 1;
+            flecs::entity southNeighbor = this->floorQuery.find([&](
+                FloorTag floorTag, Position position
+            ) {
+                return position.x == cursorX && position.y == cursorY + 1;
+            });
+            if (cursorTick == 0 && southNeighbor) cursorY += 1;
         } else if (IsKeyDown(KEY_LEFT)) {
-            if (cursorTick == 0) cursorX -= 1;
+            flecs::entity westNeighbor = this->floorQuery.find([&](
+                FloorTag floorTag, Position position
+            ) {
+                return position.x == cursorX - 1 && position.y == cursorY;
+            });
+            if (cursorTick == 0 && westNeighbor) cursorX -= 1;
         } else if (IsKeyDown(KEY_RIGHT)) {
-            if (cursorTick == 0) cursorX += 1;
+            flecs::entity eastNeighbor = this->floorQuery.find([&](
+                FloorTag floorTag, Position position
+            ) {
+                return position.x == cursorX + 1 && position.y == cursorY;
+            });
+            if (cursorTick == 0 && eastNeighbor) cursorX += 1;
         };
         cursor.set<Tick>({
             (cursorTick + 1 + cursorMaxTick) % cursorMaxTick, cursorMaxTick
