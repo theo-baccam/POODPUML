@@ -4,7 +4,11 @@
 #define BOB_NAME "Bob"
 
 
-// Used in: 4, 7, 8, 9
+#include <iostream>
+#include <typeinfo>
+
+
+// Used in: 4, 7, 8, 9, 11
 typedef struct {double value;} Health;
 
 // Used in: 4, 7
@@ -299,5 +303,29 @@ TEST_CASE("Working flecs framework") {
         // Add entity through function and check if alive
         addEntity(world);
         CHECK(world.lookup(BOB_NAME).is_alive() == true);
+    }
+
+    SUBCASE("11. Finding entities") {
+        // Function which allows to find entity if component is equal to x
+
+        flecs::world world;
+
+        flecs::entity johnDoe = world.entity().set<Health>({10});
+        REQUIRE(johnDoe.is_alive() == true);
+        REQUIRE(johnDoe.get<Health>()->value == 10);
+
+        flecs::query<Health> query = world.query<Health>();
+
+        flecs::entity foundEntity = query.find([](Health& health) {
+            return health.value == 10;
+        });
+        CHECK(foundEntity == johnDoe);
+
+        flecs::entity nonExistantEntity = query.find([](Health& health) {
+            return health.value == 1234;
+        });
+        CHECK(!nonExistantEntity);
+
+        johnDoe.destruct();
     }
 }
