@@ -38,6 +38,20 @@ void GameView::drawFloor(flecs::query<FloorTag, Position> &floorQuery) {
     });
 };
 
+void GameView::drawPathWithFilter(flecs::world &world) {
+    flecs::filter<PathTag, Position> pathFilter = (
+        world.filter<PathTag, Position>()
+    );
+
+    pathFilter.each([&](PathTag pathTag, Position position) {
+        DrawTextureV(
+            this->assetsLoader.pathTileTexture,
+            this->transformGridOblique(position.x, position.y),
+            WHITE
+        );
+    });
+}
+
 void GameView::drawStartEnd(flecs::world &world) {
     flecs::entity start = world.lookup("Start");
     const Position* startPosition = start.get<Position>();

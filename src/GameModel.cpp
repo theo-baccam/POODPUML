@@ -17,7 +17,7 @@ GameModel::GameModel(int difficulty) {
 
     this->world.entity("Cursor")
         .set<Position>({startPosition->x, startPosition->y})
-        .set<Tick>({0, 6});
+        .set<Tick>({0, 8});
 }
 GameModel::~GameModel() {
     this->world.each([](flecs::entity entity) {

@@ -14,6 +14,7 @@ class GameController : public ControllerInterface {
         GameModel model;
         GameView view;
 
+        bool creatingPath;
         flecs::query<FloorTag, Position> floorQuery;
 
         void run() override;
