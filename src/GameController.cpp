@@ -9,7 +9,7 @@
 #include <iostream>
 
 GameController::GameController():
-    model(1),
+    model(0),
     view(
         this->model.world.lookup("Cursor").get<Position>()->x,
         this->model.world.lookup("Cursor").get<Position>()->y
@@ -38,6 +38,7 @@ void GameController::run() {
     ) {
         if (IsKeyDown(KEY_UP) && cursorTick == 0) {
             cursorDestination.y -= 1;
+
             farAhead.destruct();
             farAhead = this->floorQuery.find([&](
                 FloorTag floorTag, Position position
@@ -48,8 +49,29 @@ void GameController::run() {
                 );
             });
 
+            diagonalLeft.destruct();
+            diagonalLeft = this->floorQuery.find([&](
+                FloorTag floorTag, Position position
+            ) {
+                return (
+                    position.x == cursorSource.x - 1 &&
+                    position.y == cursorSource.y - 1
+                );
+            });
+
+            diagonalRight.destruct();
+            diagonalRight = this->floorQuery.find([&](
+                FloorTag floorTag, Position position
+            ) {
+                return (
+                    position.x == cursorSource.x + 1 &&
+                    position.y == cursorSource.y - 1
+                );
+            });
+
         } else if (IsKeyDown(KEY_DOWN) && cursorTick == 0) {
             cursorDestination.y += 1;
+
             farAhead.destruct();
             farAhead = this->floorQuery.find([&](
                 FloorTag floorTag, Position position
@@ -60,8 +82,29 @@ void GameController::run() {
                 );
             });
 
+            diagonalLeft.destruct();
+            diagonalLeft = this->floorQuery.find([&](
+                FloorTag floorTag, Position position
+            ) {
+                return (
+                    position.x == cursorSource.x + 1 &&
+                    position.y == cursorSource.y + 1
+                );
+            });
+
+            diagonalRight.destruct();
+            diagonalRight = this->floorQuery.find([&](
+                FloorTag floorTag, Position position
+            ) {
+                return (
+                    position.x == cursorSource.x - 1 &&
+                    position.y == cursorSource.y + 1
+                );
+            });
+
         } else if (IsKeyDown(KEY_LEFT) && cursorTick == 0) {
             cursorDestination.x -= 1;
+
             farAhead.destruct();
             farAhead = this->floorQuery.find([&](
                 FloorTag floorTag, Position position
@@ -72,8 +115,29 @@ void GameController::run() {
                 );
             });
 
+            diagonalLeft.destruct();
+            diagonalLeft = this->floorQuery.find([&](
+                FloorTag floorTag, Position position
+            ) {
+                return (
+                    position.x == cursorSource.x - 1 &&
+                    position.y == cursorSource.y + 1
+                );
+            });
+
+            diagonalRight.destruct();
+            diagonalRight = this->floorQuery.find([&](
+                FloorTag floorTag, Position position
+            ) {
+                return (
+                    position.x == cursorSource.x - 1 &&
+                    position.y == cursorSource.y - 1
+                );
+            });
+
         } else if (IsKeyDown(KEY_RIGHT) && cursorTick == 0) {
             cursorDestination.x += 1;
+
             farAhead.destruct();
             farAhead = this->floorQuery.find([&](
                 FloorTag floorTag, Position position
@@ -84,6 +148,25 @@ void GameController::run() {
                 );
             });
 
+            diagonalLeft.destruct();
+            diagonalLeft = this->floorQuery.find([&](
+                FloorTag floorTag, Position position
+            ) {
+                return (
+                    position.x == cursorSource.x + 1 &&
+                    position.y == cursorSource.y - 1
+                );
+            });
+
+            diagonalRight.destruct();
+            diagonalRight = this->floorQuery.find([&](
+                FloorTag floorTag, Position position
+            ) {
+                return (
+                    position.x == cursorSource.x + 1 &&
+                    position.y == cursorSource.y + 1
+                );
+            });
         };
 
         cursor.set<Tick>({
@@ -115,7 +198,24 @@ void GameController::run() {
     } else if (
         farAhead.is_alive() &&
         farAhead.has<PathTag>() &&
-        !farAhead.has<PathGoesTo>(destinationTile)
+        !farAhead.has<PathGoesTo>(destinationTile) &&
+        creatingPath
+    ) {
+        cursorDestination = cursorSource;
+        destinationTile = sourceTile;
+    } else if (
+        diagonalLeft.is_alive() &&
+        diagonalLeft.has<PathTag>() &&
+        !destinationTile.has<PathGoesTo>(sourceTile) &&
+        creatingPath
+    ) {
+        cursorDestination = cursorSource;
+        destinationTile = sourceTile;
+    } else if (
+        diagonalRight.is_alive() &&
+        diagonalRight.has<PathTag>() &&
+        !destinationTile.has<PathGoesTo>(sourceTile) &&
+        creatingPath
     ) {
         cursorDestination = cursorSource;
         destinationTile = sourceTile;
@@ -137,7 +237,7 @@ void GameController::run() {
         sourceTile.add<PathGoesTo>(destinationTile);
     } else if (destinationTile.has<PathGoesTo>(sourceTile) && creatingPath) {
         sourceTile.remove<PathTag>();
-        sourceTile.remove<PathGoesTo>();
+        destinationTile.remove<PathGoesTo>(sourceTile);
     } else if (destinationTile.name() == "End" && creatingPath) {
         creatingPath = false;
     };
