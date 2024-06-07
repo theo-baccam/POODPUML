@@ -28,18 +28,62 @@ void GameController::run() {
     Position cursorSource = *cursor.get<Position>();
     Position cursorDestination = cursorSource;
 
+    flecs::entity farAhead = this->model.world.entity();
+    flecs::entity diagonalLeft = this->model.world.entity();
+    flecs::entity diagonalRight = this->model.world.entity();
+
     if (
         IsKeyDown(KEY_UP) || IsKeyDown(KEY_DOWN) ||
         IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_RIGHT)
     ) {
         if (IsKeyDown(KEY_UP) && cursorTick == 0) {
             cursorDestination.y -= 1;
+            farAhead.destruct();
+            farAhead = this->floorQuery.find([&](
+                FloorTag floorTag, Position position
+            ) {
+                return (
+                    position.x == cursorSource.x &&
+                    position.y == cursorSource.y - 2
+                );
+            });
+
         } else if (IsKeyDown(KEY_DOWN) && cursorTick == 0) {
             cursorDestination.y += 1;
+            farAhead.destruct();
+            farAhead = this->floorQuery.find([&](
+                FloorTag floorTag, Position position
+            ) {
+                return (
+                    position.x == cursorSource.x &&
+                    position.y == cursorSource.y + 2
+                );
+            });
+
         } else if (IsKeyDown(KEY_LEFT) && cursorTick == 0) {
             cursorDestination.x -= 1;
+            farAhead.destruct();
+            farAhead = this->floorQuery.find([&](
+                FloorTag floorTag, Position position
+            ) {
+                return (
+                    position.x == cursorSource.x - 2 &&
+                    position.y == cursorSource.y
+                );
+            });
+
         } else if (IsKeyDown(KEY_RIGHT) && cursorTick == 0) {
             cursorDestination.x += 1;
+            farAhead.destruct();
+            farAhead = this->floorQuery.find([&](
+                FloorTag floorTag, Position position
+            ) {
+                return (
+                    position.x == cursorSource.x + 2 &&
+                    position.y == cursorSource.y
+                );
+            });
+
         };
 
         cursor.set<Tick>({
@@ -68,7 +112,15 @@ void GameController::run() {
     if (!destinationTile) {
         cursorDestination = cursorSource;
         destinationTile = sourceTile;
+    } else if (
+        farAhead.is_alive() &&
+        farAhead.has<PathTag>() &&
+        !farAhead.has<PathGoesTo>(destinationTile)
+    ) {
+        cursorDestination = cursorSource;
+        destinationTile = sourceTile;
     };
+    
     cursor.set<Position>({cursorDestination.x, cursorDestination.y});
     this->view.camera.target = this->view.transformGridOblique(
         cursorDestination.x,
