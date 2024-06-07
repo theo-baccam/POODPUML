@@ -6,7 +6,6 @@
 #include "GameView.hpp"
 #include "colors.hpp"
 
-#include <iostream>
 
 GameController::GameController():
     model(0),
