@@ -6,6 +6,7 @@
 #include "GameView.hpp"
 #include "colors.hpp"
 
+#include <iostream>
 
 GameController::GameController():
     model(1),
@@ -24,77 +25,57 @@ void GameController::run() {
     int cursorTick = cursor.get<Tick>()->tick;
     int cursorMaxTick = cursor.get<Tick>()->maxTick;
 
-    double cursorX = cursor.get<Position>()->x;
-    double cursorY = cursor.get<Position>()->y;
-
-    flecs::entity sourceTile = this->floorQuery.find([&](
-        FloorTag floorTag, Position position
-    ) {
-        return position.x == cursorX && position.y == cursorY;
-    });
+    Position cursorSource = *cursor.get<Position>();
+    Position cursorDestination = cursorSource;
 
     if (
         IsKeyDown(KEY_UP) || IsKeyDown(KEY_DOWN) ||
         IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_RIGHT)
     ) {
-        if (IsKeyDown(KEY_UP)) {
-            flecs::entity northNeighbor = this->floorQuery.find([&](
-                FloorTag floorTag, Position position
-            ) {
-                return position.x == cursorX && position.y == cursorY - 1;
-            });
-            if (cursorTick == 0 && northNeighbor) cursorY -= 1;
-
-        } else if (IsKeyDown(KEY_DOWN)) {
-            flecs::entity southNeighbor = this->floorQuery.find([&](
-                FloorTag floorTag, Position position
-            ) {
-                return position.x == cursorX && position.y == cursorY + 1;
-            });
-            if (cursorTick == 0 && southNeighbor) cursorY += 1;
-
-        } else if (IsKeyDown(KEY_LEFT)) {
-            flecs::entity westNeighbor = this->floorQuery.find([&](
-                FloorTag floorTag, Position position
-            ) {
-                return position.x == cursorX - 1 && position.y == cursorY;
-            });
-            if (cursorTick == 0 && westNeighbor) cursorX -= 1;
-
-        } else if (IsKeyDown(KEY_RIGHT)) {
-            flecs::entity eastNeighbor = this->floorQuery.find([&](
-                FloorTag floorTag, Position position
-            ) {
-                return position.x == cursorX + 1 && position.y == cursorY;
-            });
-            if (cursorTick == 0 && eastNeighbor) cursorX += 1;
-
+        if (IsKeyDown(KEY_UP) && cursorTick == 0) {
+            cursorDestination.y -= 1;
+        } else if (IsKeyDown(KEY_DOWN) && cursorTick == 0) {
+            cursorDestination.y += 1;
+        } else if (IsKeyDown(KEY_LEFT) && cursorTick == 0) {
+            cursorDestination.x -= 1;
+        } else if (IsKeyDown(KEY_RIGHT) && cursorTick == 0) {
+            cursorDestination.x += 1;
         };
+
         cursor.set<Tick>({
-            (cursorTick + 1 + cursorMaxTick) % cursorMaxTick, cursorMaxTick
+            (cursorTick + 1 + cursorMaxTick) % cursorMaxTick,
+            cursorMaxTick
         });
-        cursor.set<Position>({cursorX, cursorY});
-        this->view.camera.target = this->view.transformGridOblique(
-            cursorX,
-            cursorY
-        );
-    };
-    if (
-        !IsKeyDown(KEY_UP) &&
-        !IsKeyDown(KEY_DOWN) &&
-        !IsKeyDown(KEY_LEFT) &&
-        !IsKeyDown(KEY_RIGHT)
-    ) {
+    } else {
         cursor.set<Tick>({0, cursorMaxTick});
     };
+
+    flecs::entity sourceTile = this->floorQuery.find([&](
+        FloorTag floorTag, Position position
+    ) {
+        return position.x == cursorSource.x && position.y == cursorSource.y;
+    });
 
     flecs::entity destinationTile = this->floorQuery.find([&](
         FloorTag floorTag, Position position
     ) {
-        return position.x == cursorX && position.y == cursorY;
+        return (
+            position.x == cursorDestination.x &&
+            position.y == cursorDestination.y
+        );
     });
+
+    if (!destinationTile) {
+        cursorDestination = cursorSource;
+        destinationTile = sourceTile;
+    };
+    cursor.set<Position>({cursorDestination.x, cursorDestination.y});
+    this->view.camera.target = this->view.transformGridOblique(
+        cursorDestination.x,
+        cursorDestination.y
+    );
+
     if (
-        destinationTile && 
         creatingPath && 
         !destinationTile.has<PathTag>() &&
         (sourceTile != destinationTile) &&
@@ -108,6 +89,7 @@ void GameController::run() {
     } else if (destinationTile.name() == "End" && creatingPath) {
         creatingPath = false;
     };
+
 
     BeginDrawing();
     ClearBackground(COLOR0);
