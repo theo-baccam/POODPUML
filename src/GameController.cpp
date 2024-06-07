@@ -6,10 +6,9 @@
 #include "GameView.hpp"
 #include "colors.hpp"
 
-#include <iostream>
 
 GameController::GameController():
-    model(2),
+    model(1),
     view(
         this->model.world.lookup("Cursor").get<Position>()->x,
         this->model.world.lookup("Cursor").get<Position>()->y
@@ -27,6 +26,12 @@ void GameController::run() {
 
     double cursorX = cursor.get<Position>()->x;
     double cursorY = cursor.get<Position>()->y;
+
+    flecs::entity sourceTile = this->floorQuery.find([&](
+        FloorTag floorTag, Position position
+    ) {
+        return position.x == cursorX && position.y == cursorY;
+    });
 
     if (
         IsKeyDown(KEY_UP) || IsKeyDown(KEY_DOWN) ||
@@ -83,13 +88,25 @@ void GameController::run() {
         cursor.set<Tick>({0, cursorMaxTick});
     };
 
-    flecs::entity currentTile = this->floorQuery.find([&](
+    flecs::entity destinationTile = this->floorQuery.find([&](
         FloorTag floorTag, Position position
     ) {
         return position.x == cursorX && position.y == cursorY;
     });
-    if (currentTile && creatingPath && !currentTile.has<PathTag>()) {
-        currentTile.add<PathTag>();
+    if (
+        destinationTile && 
+        creatingPath && 
+        !destinationTile.has<PathTag>() &&
+        (sourceTile != destinationTile) &&
+        destinationTile.name() != "Start"
+    ) {
+        destinationTile.add<PathTag>();
+        sourceTile.add<PathGoesTo>(destinationTile);
+    } else if (destinationTile.has<PathGoesTo>(sourceTile) && creatingPath) {
+        sourceTile.remove<PathTag>();
+        sourceTile.remove<PathGoesTo>();
+    } else if (destinationTile.name() == "End" && creatingPath) {
+        creatingPath = false;
     };
 
     BeginDrawing();
