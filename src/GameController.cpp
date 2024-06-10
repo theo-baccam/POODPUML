@@ -6,38 +6,55 @@
 #include "GameView.hpp"
 #include "colors.hpp"
 
-
+// Constructor for GameController
 GameController::GameController():
     model(0),
     view(
+        // Initialize the view with the position of the cursor
         this->model.world.lookup("Cursor").get<Position>()->x,
         this->model.world.lookup("Cursor").get<Position>()->y
     ) {
+    // Initialize the floorQuery with the positions of the floor tiles
     this->floorQuery = this->model.world.query<FloorTag, Position>();
+    // Set creatingPath to true to start creating a path
     this->creatingPath = true;
 }
+
+
+// Destructor for GameController
 GameController::~GameController() {}
 
+// Main game loop
 void GameController::run() {
+    // Get the cursor entity
     flecs::entity cursor = this->model.world.lookup("Cursor");
 
+
+    // Get the current tick and max tick of the cursor
     int cursorTick = cursor.get<Tick>()->tick;
     int cursorMaxTick = cursor.get<Tick>()->maxTick;
 
+    // Get the current position of the cursor
     Position cursorSource = *cursor.get<Position>();
     Position cursorDestination = cursorSource;
 
+    // Initialize entities for farAhead, diagonalLeft, and diagonalRight
     flecs::entity farAhead = this->model.world.entity();
     flecs::entity diagonalLeft = this->model.world.entity();
     flecs::entity diagonalRight = this->model.world.entity();
 
+
+    // Initialize entities for farAhead, diagonalLeft, and diagonalRight
     if (
         IsKeyDown(KEY_UP) || IsKeyDown(KEY_DOWN) ||
         IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_RIGHT)
     ) {
+        // If the up arrow key is pressed and the cursor is at the start of its tick cycle
         if (IsKeyDown(KEY_UP) && cursorTick == 0) {
+            // Move the cursor up
             cursorDestination.y -= 1;
 
+            // Find the tile two spaces ahead of the cursor
             farAhead.destruct();
             farAhead = this->floorQuery.find([&](
                 FloorTag floorTag, Position position
@@ -48,6 +65,7 @@ void GameController::run() {
                 );
             });
 
+            // Find the tile diagonally left of the cursor
             diagonalLeft.destruct();
             diagonalLeft = this->floorQuery.find([&](
                 FloorTag floorTag, Position position
@@ -58,6 +76,7 @@ void GameController::run() {
                 );
             });
 
+            // Find the tile diagonally right of the cursor
             diagonalRight.destruct();
             diagonalRight = this->floorQuery.find([&](
                 FloorTag floorTag, Position position
